@@ -1,165 +1,98 @@
-# Sentiment Analysis using Deep Learning
+# Sentiment Analysis with Deep Learning
 
-An English sentiment analysis project developed for **DataPulse Solutions** using the IMDb Movie Reviews dataset and a Bidirectional LSTM (BiLSTM) neural network.
+A natural language processing project that classifies English movie reviews as **positive** or **negative** using a **Bidirectional LSTM (BiLSTM)** neural network built with TensorFlow/Keras.
 
-## Project Objective
+> The notebook trains and evaluates the model from the IMDb dataset. Metrics are generated on execution; any older metric values should be treated as historical until reproduced with the current notebook.
 
-Build a Deep Learning / NLP model that classifies English text into two sentiment classes:
+## Project Overview
 
-- **Positive**
-- **Negative**
+- **Task:** Binary sentiment classification
+- **Dataset:** IMDb movie reviews provided by `tf.keras.datasets.imdb`
+- **Model:** Embedding → Bidirectional LSTM → Dense layers → Sigmoid
+- **Sequence length:** 250 tokens
+- **Vocabulary:** 10,000 most frequent word IDs
+- **Evaluation:** Held-out test loss, accuracy, ROC-AUC, classification report, and confusion matrix
+- **Notebook:** Jupyter / Google Colab compatible
 
-The project provides a foundation that can be integrated into future DataPulse Solutions data-analysis tools.
-
-## Dataset
-
-The project uses the standard **IMDb Movie Reviews** dataset through TensorFlow/Keras.
-
-- 25,000 training reviews
-- 25,000 test reviews
-- English text
-- Binary sentiment labels
-- Vocabulary limited to the 10,000 most frequent words
-
-The dataset is downloaded automatically by Keras when the notebook is first executed.
-
-## Model Architecture
-
-```text
-Input Text
-    ↓
-Tokenization / Integer Encoding
-    ↓
-Padding (250 tokens)
-    ↓
-Embedding
-    ↓
-Bidirectional LSTM
-    ↓
-Dropout
-    ↓
-Dense (ReLU)
-    ↓
-Dropout
-    ↓
-Sigmoid
-    ↓
-Positive / Negative
-```
-
-## Technologies
-
-- Python
-- TensorFlow / Keras
-- NumPy
-- Pandas
-- Scikit-learn
-- Matplotlib
-- Seaborn
-- Jupyter Notebook
-
-## Model Results
-
-Results obtained from the executed model:
-
-| Metric | Result |
-|---|---:|
-| Training Accuracy (Epoch 4) | **92.44%** |
-| Best Validation Accuracy | **85.70%** |
-| Test Accuracy | **84.31%** |
-| Test Loss | **0.3685** |
-
-### Real-Time Testing
-
-**Positive example**
-
-> This movie was amazing, emotional and absolutely worth watching!
-
-**Prediction:** Positive  
-**Confidence:** 76.54%
-
-**Negative example**
-
-> The service was terrible and I completely regret buying this product.
-
-**Prediction:** Negative  
-**Confidence:** 90.28%
-
-## Training Summary
-
-| Epoch | Training Accuracy | Training Loss | Validation Accuracy | Validation Loss |
-|---|---:|---:|---:|---:|
-| 1 | 74.79% | 0.5056 | 51.82% | 1.0325 |
-| 2 | 81.53% | 0.4146 | 85.50% | 0.3433 |
-| 3 | 89.50% | 0.2840 | 85.20% | 0.3643 |
-| 4 | 92.44% | 0.2129 | 85.70% | 0.3958 |
-
-The training accuracy increased faster than validation accuracy by later epochs, indicating some early signs of overfitting. EarlyStopping is used in the notebook to restore the best validation-loss weights.
-
-## Project Structure
+## Repository Structure
 
 ```text
 sentiment-analysis-deep-learning/
-├── Sentiment_Analysis_IMDb_BiLSTM.ipynb
-├── README.md
-└── requirements.txt
+├── Sentiment_Analysis_IMDb_BiLSTM.ipynb  # Full training and evaluation workflow
+├── requirements.txt                       # Python dependencies
+└── README.md
 ```
 
-## How to Run
+## Getting Started
 
-### 1. Clone the repository
+### Option 1 — Google Colab
+
+Open the [notebook in Google Colab](https://colab.research.google.com/github/HBE-2206/sentiment-analysis-deep-learning/blob/main/Sentiment_Analysis_IMDb_BiLSTM.ipynb), then run the cells from top to bottom. A GPU runtime can reduce training time, but CPU execution is also supported.
+
+### Option 2 — Run locally
 
 ```bash
 git clone https://github.com/HBE-2206/sentiment-analysis-deep-learning.git
 cd sentiment-analysis-deep-learning
-```
 
-### 2. Install dependencies
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
 
-```bash
+python -m pip install --upgrade pip
 pip install -r requirements.txt
-```
-
-### 3. Start Jupyter Notebook
-
-```bash
 jupyter notebook
 ```
 
-### 4. Open the notebook
+Open `Sentiment_Analysis_IMDb_BiLSTM.ipynb` and run all cells. Keras downloads the IMDb dataset when needed, so the first execution requires an internet connection.
 
-Open:
+## Workflow
 
-`Sentiment_Analysis_IMDb_BiLSTM.ipynb`
+1. Load the IMDb training and test splits.
+2. Pad and truncate integer-encoded reviews to a consistent length.
+3. Build a BiLSTM binary classifier.
+4. Train with a validation split, early stopping, and learning-rate reduction.
+5. Plot learning curves.
+6. Evaluate against the held-out test set.
+7. Display a confusion matrix and classification report.
+8. Run inference on custom English text.
+9. Save the trained model as `artifacts/imdb_bilstm.keras`.
 
-### 5. Run all cells
-
-Run the notebook from top to bottom. It covers dataset loading, exploration, preprocessing, model construction, training, evaluation, performance curves, confusion matrix, and real-time prediction.
-
-## Real-Time Testing
-
-The notebook includes a prediction function that accepts a new English sentence and returns:
-
-- Predicted sentiment
-- Confidence
-- Positive probability
-
-Example:
+## Model Architecture
 
 ```text
-Input: I really enjoyed this movie!
-Output: Positive
-Confidence: XX.XX%
+Integer-encoded review
+        ↓
+Padding / truncation (250 tokens)
+        ↓
+Embedding (10,000-token vocabulary)
+        ↓
+Bidirectional LSTM
+        ↓
+Dense + Dropout
+        ↓
+Sigmoid probability
+        ↓
+Negative / Positive
 ```
 
-## Future Improvements
+## Example Inference
 
-- Pretrained word embeddings such as GloVe
-- Transformer-based models such as BERT
-- Improved text preprocessing
-- REST API deployment
-- Web interface
-- Multi-class sentiment analysis
+The notebook includes a `predict_sentiment(text)` helper returning the predicted class, confidence, and positive-class probability. Example outputs depend on the model weights produced during the run.
+
+## Important Notes
+
+- The classification scope is binary sentiment in English.
+- IMDb vocabulary token IDs and preprocessing must remain consistent between training and inference.
+- Validation data is used during training for early stopping; the test set is held out for final evaluation.
+- Neural network results can vary with TensorFlow version, hardware, and runtime settings.
+- No trained model weights are committed; the notebook produces them when executed.
+
+## Technologies
+
+Python · TensorFlow · Keras · NumPy · Pandas · scikit-learn · Matplotlib · Seaborn · Jupyter Notebook
 
 ## Author
 
